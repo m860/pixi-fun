@@ -13,6 +13,7 @@ console.log("environment:%s", process.env.NODE_ENV);
 
 var output = {
 	path: path.join(__dirname, "dist")
+	//,"publicPath":"/"
 };
 
 if (isProduction()) {
@@ -35,7 +36,7 @@ var plugins = [
 	})
 	//global module
 	, new webpack.ProvidePlugin({
-		PIXI: 'PIXI'
+		PIXI: 'pixi.js'
 	})
 	//clean dist
 	, new CleanWebpackPlugin(['dist'], {
