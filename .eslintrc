@@ -2,7 +2,8 @@
   "parser": "babel-eslint",
   "extends": ["eslint:recommended"],
   "globals":{
-    "PIXI"
+    "PIXI":true,
+    "Matter":true
   },
   "env":{
     "browser":true,
