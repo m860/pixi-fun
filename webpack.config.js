@@ -36,7 +36,8 @@ var plugins = [
 	})
 	//global module
 	, new webpack.ProvidePlugin({
-		PIXI: 'pixi.js'
+		PIXI: 'pixi.js',
+		Matter:'matter-js'
 	})
 	//clean dist
 	, new CleanWebpackPlugin(['dist'], {
