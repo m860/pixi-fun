@@ -1,7 +1,6 @@
 /**
  * Created by jean.h.ma on 1/5/17.
  */
-import config from "./config.js";
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // box2d short name
 let b2BodyDef = Box2D.Dynamics.b2BodyDef,
@@ -21,6 +20,26 @@ let Container = PIXI.Container,
 	loader = PIXI.loader,
 	resources = PIXI.loader.resources,
 	Sprite = PIXI.Sprite;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+let config={
+	debug: false,
+		world: {
+	scale: 30.0,
+		fps: 30,
+		velocityIterations: 10,
+		positionIterations: 2,
+		gravity: new b2Vec2(0, 10),
+		allowSleep: true,
+},
+	renderer: {
+		width: window.innerWidth,
+			height: window.innerHeight
+	},
+	resources:{
+		ball:require("./assets/temp/ball.png"),
+			brick:require("./assets/temp/brick.png")
+	}
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let createRender = (width, height, debug = false)=> {
 
