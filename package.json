@@ -41,6 +41,7 @@
     "html-webpack-plugin": "^2.26.0",
     "image-loader": "0.0.1",
     "image-webpack-loader": "^3.1.0",
+    "json-loader": "^0.5.4",
     "node-sass": "^4.1.1",
     "postcss-loader": "^1.2.1",
     "sass-loader": "^4.1.1",

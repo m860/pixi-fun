@@ -1,10 +1,8 @@
 /**
  * Created by jean.h.ma on 1/5/17.
  */
-require("./index.sass");
-import ballImage from './assets/temp/ball.png';
-import brickImage from './assets/temp/brick.png';
-
+import config from "./config.js";
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // box2d short name
 let b2BodyDef = Box2D.Dynamics.b2BodyDef,
 	b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
@@ -23,8 +21,9 @@ let Container = PIXI.Container,
 	loader = PIXI.loader,
 	resources = PIXI.loader.resources,
 	Sprite = PIXI.Sprite;
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let createRender = (width, height, debug = false)=> {
+
 	let renderer;
 	if (debug) {
 		renderer = new CanvasRenderer(width, height);
@@ -117,6 +116,13 @@ let createBall=(world, stage, texture, x, y, radius, scale = 30.0)=>{
 	body.$sprite = sprite;
 	return body;
 };
+let getResourcesArray=(res)=>{
+	let arr=[];
+	for(let key in res){
+		arr.push(res[key]);
+	}
+	return arr;
+};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Keyboard{
 	static W=87
@@ -146,39 +152,37 @@ class Keyboard{
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//create canvas render
-let width = 800;
-let height = 600;
-let debug = true;
-// let debug = false;
-let renderer = createRender(width, height, debug);
+//create render
+let renderer = createRender(config.renderer.width,config.renderer.height,config.debug);
 document.body.appendChild(renderer.view);
 let stage = new Container();
 
-let gravity = new b2Vec2(0, 20);
-let allowSleep = true;
-let scale = 30.0;
-let world = new b2World(gravity, allowSleep);
-if (debug) {
+//create world
+let world = new b2World(config.world.gravity, config.world.allowSleep);
+if (config.debug) {
 	let context = renderer.view.getContext('2d');
-	appendDebugRender(world, context, scale);
+	appendDebugRender(world, context, config.world.scale);
 }
+
+// create keyboard linsten
 let keyboard=new Keyboard();
-loader.add([brickImage,ballImage]).load(()=> {
+
+// load assets
+loader.add(getResourcesArray(config.resources)).load(()=> {
 	// bottom ground
-	createGround(world,stage,resources[brickImage].texture,400,590,800,20);
+	createGround(world,stage,resources[config.resources.brick].texture,400,590,800,20);
 	// left ground
-	createGround(world,stage,resources[brickImage].texture,0,300,20,800);
+	createGround(world,stage,resources[config.resources.brick].texture,0,300,20,800);
 	// right ground
-	createGround(world,stage,resources[brickImage].texture,790,300,20,800);
+	createGround(world,stage,resources[config.resources.brick].texture,790,300,20,800);
 	//
-	createGround(world,stage,resources[brickImage].texture,400,10,800,20);
+	createGround(world,stage,resources[config.resources.brick].texture,400,10,800,20);
 
 	//ball
-	let ball=createBall(world,stage,resources[ballImage].texture,400,300,30);
+	let ball=createBall(world,stage,resources[config.resources.ball].texture,400,300,30);
 	ball.SetSleepingAllowed(false);
 	// ball.ApplyForce(new b2Vec2(2,0),ball.GetLocalCenter());
-
+	createBall(world,stage,resources[config.resources.ball].texture,60,60,30);
 	// document.addEventListener("keypress",event=>{
 	// 	if(event.keyCode===32){
 	// 		ball.ApplyForce(new b2Vec2(0,-3),ball.GetWorldCenter());
@@ -186,7 +190,7 @@ loader.add([brickImage,ballImage]).load(()=> {
 	// },false);
 
 	// loop
-	update(debug, world, scale, renderer, stage, 30,()=>{
+	update(config.debug, world, config.world.scale, renderer, stage, 30,()=>{
 		// let ballPos=ball.GetPosition();
 		// if(keyboard.keydown(Keyboard.W)){
 		// 	ballPos.y--;
@@ -202,10 +206,14 @@ loader.add([brickImage,ballImage]).load(()=> {
 		// }
 		// ball.SetPosition(ballPos);
 		if(keyboard.keydown(Keyboard.SPACE)){
-			ball.SetLinearVelocity(new b2Vec2(0,-10));
+			let curLinearVelocity=ball.GetLinearVelocity();
+			if(curLinearVelocity.y===0) {
+				ball.SetLinearVelocity(new b2Vec2(0, -10));
+			}
 		}
 	});
 });
+
 
 
 
