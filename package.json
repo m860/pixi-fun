@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/m860/pixi-fun#readme",
   "dependencies": {
+    "box2dweb": "^2.1.0-b",
     "pixi.js": "^4.3.1"
   },
   "devDependencies": {

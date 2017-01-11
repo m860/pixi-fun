@@ -36,8 +36,11 @@ var plugins = [
 	})
 	//global module
 	, new webpack.ProvidePlugin({
-		PIXI: 'pixi.js'
+		// Box2D:path.join(__dirname,"src/libs/Box2D.js")
+		Box2D:'box2dweb'
+		,PIXI: 'pixi.js'
 	})
+
 	//clean dist
 	, new CleanWebpackPlugin(['dist'], {
 		root: __dirname,

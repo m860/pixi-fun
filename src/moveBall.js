@@ -68,7 +68,7 @@ let update = (debug, world, scale = 30.0, renderer, stage, fps = 60.0,onKeyboard
 	}
 	else {
 		let body = world.GetBodyList();
-		while (body && body.IsAwake()) {
+		while (body) {
 			applyState(body, scale);
 			body = body.GetNext();
 		}
@@ -87,7 +87,7 @@ let createGround = (world, stage, texture, x, y, width, height, scale = 30.0)=> 
 	let fixtureDef = new b2FixtureDef();
 	fixtureDef.density = 1.0;
 	fixtureDef.friction = 0.8;
-	fixtureDef.restitution = 0.0;
+	fixtureDef.restitution = 0.2;
 	fixtureDef.shape = new b2PolygonShape();
 	fixtureDef.shape.SetAsBox(getRV(width / 2, scale), getRV(height / 2, scale));
 	let body = world.CreateBody(bodyDef);
@@ -106,7 +106,7 @@ let createBall=(world, stage, texture, x, y, radius, scale = 30.0)=>{
 	let fixtureDef = new b2FixtureDef();
 	fixtureDef.density = 1.0;
 	fixtureDef.friction = 0.8;
-	fixtureDef.restitution = 0.0;
+	fixtureDef.restitution = 0.2;
 	fixtureDef.shape = new b2CircleShape(getRV(radius,scale));
 	let body = world.CreateBody(bodyDef);
 	body.CreateFixture(fixtureDef);
@@ -155,7 +155,7 @@ let renderer = createRender(width, height, debug);
 document.body.appendChild(renderer.view);
 let stage = new Container();
 
-let gravity = new b2Vec2(0, 20);
+let gravity = new b2Vec2(0, 0);
 let allowSleep = true;
 let scale = 30.0;
 let world = new b2World(gravity, allowSleep);
@@ -186,24 +186,21 @@ loader.add([brickImage,ballImage]).load(()=> {
 	// },false);
 
 	// loop
-	update(debug, world, scale, renderer, stage, 30,()=>{
-		// let ballPos=ball.GetPosition();
-		// if(keyboard.keydown(Keyboard.W)){
-		// 	ballPos.y--;
-		// }
-		// if(keyboard.keydown(Keyboard.S)){
-		// 	ballPos.y++;
-		// }
-		// if(keyboard.keydown(Keyboard.A)){
-		// 	ballPos.x--;
-		// }
-		// if(keyboard.keydown(Keyboard.D)){
-		// 	ballPos.x++;
-		// }
-		// ball.SetPosition(ballPos);
-		if(keyboard.keydown(Keyboard.SPACE)){
-			ball.SetLinearVelocity(new b2Vec2(0,-10));
+	update(debug, world, scale, renderer, stage, 60,()=>{
+		let ballPos=ball.GetPosition();
+		if(keyboard.keydown(Keyboard.W)){
+			ballPos.y--;
 		}
+		if(keyboard.keydown(Keyboard.S)){
+			ballPos.y++;
+		}
+		if(keyboard.keydown(Keyboard.A)){
+			ballPos.x--;
+		}
+		if(keyboard.keydown(Keyboard.D)){
+			ballPos.x++;
+		}
+		ball.SetPosition(ballPos);
 	});
 });
 
