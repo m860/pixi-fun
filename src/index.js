@@ -8,6 +8,8 @@ import brickImage from './assets/temp/brick.png';
 
 // box2d short name
 let b2BodyDef = Box2D.Dynamics.b2BodyDef,
+	b2ContactFilter = Box2D.Dynamics.b2ContactFilter,
+	b2ContactListener = Box2D.Dynamics.b2ContactListener,
 	b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
 	b2Vec2 = Box2D.Common.Math.b2Vec2,
 	b2World = Box2D.Dynamics.b2World,
@@ -42,6 +44,10 @@ let config = {
 		height: window.innerHeight
 	}
 }
+const EDGE = 0x000001;
+const PLAYER = 0x000010;
+const BULLET = 0x000100;
+const OTHER = 0x001000;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 let createRender = (width, height, debug = false)=> {
@@ -78,8 +84,11 @@ let applyState = (body, scale = 30.0)=> {
 	}
 };
 
-let update = (debug, world, scale = 30.0, renderer, stage, fps = 60.0, onKeyboard, lastUpdateTime = Date.now())=> {
-
+let update = (debug, world, scale = 30.0, renderer, stage, fps = 60.0, onPreStep = ()=> {
+}, onRender = ()=> {
+}, lastUpdateTime = Date.now())=> {
+	onPreStep(Date.now() - lastUpdateTime);
+	lastUpdateTime = Date.now();
 	world.Step(1 / fps, config.world.velocityIterations, config.world.positionIterations);
 	if (debug) {
 		world.DrawDebugData();
@@ -92,12 +101,9 @@ let update = (debug, world, scale = 30.0, renderer, stage, fps = 60.0, onKeyboar
 		}
 		renderer.render(stage);
 	}
-	if (onKeyboard) {
-		onKeyboard(Date.now() - lastUpdateTime);
-	}
-	lastUpdateTime = Date.now();
+	onRender();
 	return requestAnimationFrame(()=> {
-		update(debug, world, scale, renderer, stage, fps, onKeyboard, lastUpdateTime);
+		update(debug, world, scale, renderer, stage, fps, onPreStep, onRender, lastUpdateTime);
 	});
 };
 
@@ -169,32 +175,34 @@ let createEdge = (world, stage, position = 0)=> {
 	let bodyDef = new b2BodyDef();
 	bodyDef.type = b2Body.b2_staticBody;
 	bodyDef.position.Set(getRV(x, config.world.scale), getRV(y, config.world.scale));
+	bodyDef.userData = {
+		type: EDGE
+	};
 	let fixtureDef = new b2FixtureDef();
 	fixtureDef.density = 1.0;
 	fixtureDef.friction = 0.8;
 	fixtureDef.restitution = 0.0;
 	fixtureDef.shape = new b2PolygonShape();
 	fixtureDef.shape.SetAsBox(getRV(width / 2, config.world.scale), getRV(height / 2, config.world.scale));
+	fixtureDef.userData = {
+		type: EDGE
+	};
 	let body = world.CreateBody(bodyDef);
 	body.CreateFixture(fixtureDef);
 	return body;
 };
-let createPlayer = (world)=> {
-	let x = config.renderer.width / 2,
-		y = config.renderer.height - 100,
-		radius = 30;
-	let bodyDef = new b2BodyDef();
-	bodyDef.type = b2Body.b2_dynamicBody;
-	bodyDef.position.Set(getRV(x, config.world.scale), getRV(y, config.world.scale));
-	let fixtureDef = new b2FixtureDef();
-	fixtureDef.density = 1.0;
-	fixtureDef.friction = 0.8;
-	fixtureDef.restitution = 0.0;
-	fixtureDef.shape = new b2CircleShape(getRV(radius, config.world.scale));
-	let body = world.CreateBody(bodyDef);
-	body.SetSleepingAllowed(false);
-	body.CreateFixture(fixtureDef);
-	return body;
+let removeDead = (world, deads = [])=> {
+	let body = deads.pop();
+	while (body) {
+		world.DestroyBody(body);
+		body = deads.pop();
+	}
+};
+let getBodyByType=(type,bodies)=>{
+	return bodies.find(body=>{
+		let ud=body.GetUserData();
+		return type===ud.type;
+	});
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Keyboard {
@@ -235,11 +243,17 @@ class Player {
 		let bodyDef = new b2BodyDef();
 		bodyDef.type = b2Body.b2_dynamicBody;
 		bodyDef.position.Set(getRV(x, config.world.scale), getRV(y, config.world.scale));
+		bodyDef.userData = {
+			type: PLAYER
+		};
 		let fixtureDef = new b2FixtureDef();
 		fixtureDef.density = 1.0;
-		fixtureDef.friction = 0.8;
+		fixtureDef.friction = 0.0;
 		fixtureDef.restitution = 0.0;
 		fixtureDef.shape = new b2CircleShape(getRV(radius, config.world.scale));
+		fixtureDef.userData = {
+			type: PLAYER
+		};
 		let body = world.CreateBody(bodyDef);
 		body.SetSleepingAllowed(false);
 		// body.SetAngle(Math.PI/2);
@@ -254,9 +268,18 @@ class Player {
 		this.bulletBodyDef.type = b2Body.b2_dynamicBody;
 		this.bulletBodyDef.bullet = true;
 		this.bulletBodyDef.fixedRotation = true;
+		this.bulletBodyDef.userData = {
+			type: BULLET
+		};
 		// this.bulletBodyDef.linearVelocity=new b2Vec2()
 		this.bulletFixtureDef = new b2FixtureDef();
+		this.bulletFixtureDef.density = 1.0;
+		this.bulletFixtureDef.friction = 0;
+		this.bulletFixtureDef.restitution = 0;
 		this.bulletFixtureDef.shape = new b2CircleShape(getRV(2));
+		this.bulletFixtureDef.userData = {
+			type: BULLET
+		};
 		// this.bulletFixtureDef.shape.SetAsBox(getRV(0.1,config.world.scale),getRV(5,config.world.scale));
 		this.fireDuration = 100;
 		this.lastFireTime = Date.now();
@@ -278,7 +301,7 @@ class Player {
 	}
 
 	getWorldFacing() {
-		let v= this.body.GetWorldPoint(new b2Vec2(0,-1)).Copy();
+		let v = this.body.GetWorldPoint(new b2Vec2(0, -1)).Copy();
 		v.Multiply(config.world.scale);
 		return v;
 	}
@@ -302,7 +325,7 @@ class Player {
 
 	drawFacing(context) {
 		let center = this.getCenter();
-		let facingPoint=this.getWorldFacing()
+		let facingPoint = this.getWorldFacing()
 		// context.beginPath();
 		// context.arc(center.x,center.y,5,0,Math.PI*2);
 		// context.stroke();
@@ -310,23 +333,23 @@ class Player {
 		// context.arc(facingPoint.x,facingPoint.y,5,0,Math.PI*2);
 		// context.stroke();
 		context.beginPath();
-		context.moveTo(center.x,center.y);
-		context.lineTo(facingPoint.x,facingPoint.y);
+		context.moveTo(center.x, center.y);
+		context.lineTo(facingPoint.x, facingPoint.y);
 		context.stroke();
 	}
 
 	fire(deltaTime) {
-		let escape=Date.now()-this.lastFireTime;
-		if(escape>=this.fireDuration) {
+		let escape = Date.now() - this.lastFireTime;
+		if (escape >= this.fireDuration) {
 			let bullet = this.world.CreateBody(this.bulletBodyDef);
 			bullet.CreateFixture(this.bulletFixtureDef);
 			let pos = this.getWorldFacing();
-			pos.Multiply(1/config.world.scale);
+			pos.Multiply(1 / config.world.scale);
 			bullet.SetPosition(pos);
 			let velocity = this.getFacing();
-			velocity.Multiply(deltaTime * 0.2);
+			velocity.Multiply(deltaTime * 1);
 			bullet.SetLinearVelocity(velocity);
-			this.lastFireTime=Date.now();
+			this.lastFireTime = Date.now();
 		}
 	}
 }
@@ -343,6 +366,40 @@ if (config.debug) {
 }
 let keyboard = new Keyboard();
 
+let dead = [];
+
+// filter
+let contactFilter = new b2ContactFilter();
+contactFilter.ShouldCollide = (a, b)=> {
+	let ua = a.GetUserData();
+	let ub = b.GetUserData();
+	let r = ua.type | ub.type;
+	switch (r) {
+		case BULLET:
+		case BULLET | PLAYER:
+			return false;
+		default:
+			return true;
+	}
+};
+world.SetContactFilter(contactFilter);
+
+// contact listener
+let contactListener = new b2ContactListener();
+contactListener.BeginContact = (contact)=> {
+	let fa = contact.GetFixtureA();
+	let fb = contact.GetFixtureB();
+	let ua = fa.GetUserData();
+	let ub = fb.GetUserData();
+	let r = ua.type | ub.type;
+	switch (r) {
+		case BULLET|EDGE:
+			dead.push(getBodyByType(BULLET,[fa.GetBody(),fb.GetBody()]));
+			break;
+	}
+};
+world.SetContactListener(contactListener);
+
 loader.add([brickImage, ballImage]).load(()=> {
 	createEdge(world, stage, 0);
 	createEdge(world, stage, 1);
@@ -353,6 +410,7 @@ loader.add([brickImage, ballImage]).load(()=> {
 
 	// loop
 	update(config.debug, world, config.world.scale, renderer, stage, config.world.fps, (deltaTime)=> {
+		removeDead(world, dead);
 		world.ClearForces();
 		if (keyboard.keydown(Keyboard.A)) {
 			player.turn(deltaTime, false);
@@ -369,6 +427,8 @@ loader.add([brickImage, ballImage]).load(()=> {
 		if (keyboard.keydown(Keyboard.J)) {
 			player.fire(deltaTime);
 		}
+
+	}, ()=> {
 		player.drawFacing(context);
 	});
 });
