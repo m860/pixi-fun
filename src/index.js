@@ -347,7 +347,7 @@ class Player {
 			pos.Multiply(1 / config.world.scale);
 			bullet.SetPosition(pos);
 			let velocity = this.getFacing();
-			velocity.Multiply(deltaTime * 1);
+			velocity.Multiply(Number(deltaTime) * 1);
 			bullet.SetLinearVelocity(velocity);
 			this.lastFireTime = Date.now();
 		}
@@ -396,6 +396,7 @@ contactListener.BeginContact = (contact)=> {
 		case BULLET|EDGE:
 			dead.push(getBodyByType(BULLET,[fa.GetBody(),fb.GetBody()]));
 			break;
+		default:
 	}
 };
 world.SetContactListener(contactListener);

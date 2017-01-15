@@ -31,14 +31,14 @@ var plugins = [
 	new webpack.optimize.CommonsChunkPlugin({
 		name: "vendor"
 		, filename: "vendor.bundle.js"
-		, minChunks: 2
-		, children: true
+		// , minChunks: 2
+		// , children: true
 	})
 	//global module
 	, new webpack.ProvidePlugin({
 		// Box2D:path.join(__dirname,"src/libs/Box2D.js")
 		Box2D:'box2dweb'
-		,PIXI: 'pixi.js'
+        ,PIXI: 'pixi.js'
 	})
 
 	//clean dist
@@ -76,6 +76,7 @@ module.exports = {
 		vendor: [
 			"babel-polyfill"
 			, "pixi.js"
+			,'box2dweb'
 		]
 	}
 	, output: output
