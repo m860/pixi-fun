@@ -39,7 +39,7 @@ export default class World {
             let debugDraw = new Box2D.Dynamics.b2DebugDraw();
             debugDraw.SetSprite(this.renderer.view.getContext('2d'));
             debugDraw.SetAlpha(0.5);
-            debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit /*| b2DebugDraw.e_centerOfMassBit*/);
+            debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit | Box2D.Dynamics.b2DebugDraw.e_centerOfMassBit);
             debugDraw.SetDrawScale(conf.scale);
             this.physics.SetDebugDraw(debugDraw);
         }
@@ -78,13 +78,31 @@ export default class World {
         onAfterRender();
     }
 
-    push(scene: Object) {
+    push(scene: Object,autoStart:Boolean=true) {
         //clear previous scene
         // cancel update & remove all body & remove all sprite etc...
         //TODO
+
+        //load new scene
         scene.world=this;
+        //create body
+        for(let name in scene.bodies){
+            let obj=scene.bodies[name];
+            obj.body=this.physics.CreateBody(obj.bodyDef);
+            obj.fixtureDefs.map(fixture=>{
+                obj.body.CreateFixture(fixture);
+            })
+        }
+
+        //add sprite
+        for(let name in scene.sprites){
+            let obj=scene.sprites[name];
+            this.stage.addChild(obj.sprite);
+        }
         this._scenes.push(scene);
-        scene.start();
+        if(autoStart) {
+            scene.update();
+        }
     }
 
     pop() {

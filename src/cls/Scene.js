@@ -3,17 +3,21 @@
  */
 export default class Scene{
     constructor(conf:{
-        onInit:Function
-        ,onUpdate:Function
+        onBeforeStep:Function
+        ,onAfterStep:Function
+        ,onBeforeRender:Function
+        ,onAfterRender:Function
     }={
-        onInit:()=>{}
-        ,onUpdate:()=>{}
+        onBeforeStep:()=>{}
+        ,onAfterStep:()=>{}
+        ,onBeforeRender:()=>{}
+        ,onAfterRender:()=>{}
     }){
+        this.conf=conf;
         this.world=null;
-        conf.onInit(this);
-        conf.onUpdate(this);
         this.bodies={};
         this.sprites={};
+        this.pause=false;
     }
     addBody(name:String,bodyDef:Box2D.Dynamics.b2BodyDef,fixtureDefs:Box2D.Dynamics.b2FixtureDef[]){
         if(!this.bodies[name]){
@@ -37,13 +41,12 @@ export default class Scene{
             throw new Error(`the sprite name is ${name} is exists`);
         }
     }
-    start(){
-        this.world.step();
-        this.world.render();
-        this.update();
-    }
     update(){
-        requestAnimationFrame(this.update.bind(this));
+        if(!this.pause) {
+            this.world.step(this.conf.onBeforeStep, this.conf.onAfterStep);
+            this.world.render(this.conf.onBeforeRender, this.conf.onAfterRender);
+            requestAnimationFrame(this.update.bind(this));
+        }
     }
     stop(){
     }
