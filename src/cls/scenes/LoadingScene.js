@@ -14,7 +14,7 @@ export const ASSETS = {
 	, title: require('../../assets/title.png')
 	, xiaolu: require('../../assets/xiaolu.png')
 }
-export default class Loading extends Scene {
+export default class LoadingScene extends Scene {
 	constructor(onLoaded: Function, conf) {
 		super(conf);
 		this.onLoaded = onLoaded;

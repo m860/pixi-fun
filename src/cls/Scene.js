@@ -54,7 +54,7 @@ export default class Scene{
             requestAnimationFrame(this.update.bind(this));
         }
         if(this.status===Scene.STATUS_CLEAR){
-            debugger
+            console.log(`${this.constructor.name} is clear`);
             // remove all bodies
             this.world.removeAllBodies();
             // remove all sprite
@@ -73,7 +73,6 @@ export default class Scene{
         this.update();
     }
     clear(callback:Function=()=>{}){
-
         this.status=Scene.STATUS_CLEAR;
         this.onClear=callback;
     }

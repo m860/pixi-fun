@@ -93,9 +93,7 @@ export default class World {
 	}
 
 	removeAllSprite(){
-		for(let i=0;i<this.stage.length;i++){
-			this.stage.removeChild(this.stage[i]);
-		}
+		this.stage.removeChildren();
 	}
 
 	push(scene: Object, autoStart: Boolean = true) {

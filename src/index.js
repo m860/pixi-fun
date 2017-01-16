@@ -1,16 +1,19 @@
 require('./index.sass')
 import World from './cls/World.js'
-import Loading from './cls/scenes/Loading.js'
-import Main from './cls/Scenes/Main.js'
+import LoadingScene from './cls/scenes/LoadingScene.js'
+import MainScene from './cls/scenes/MainScene.js'
 
 let world = new World();
 
 
-let mainScene = new Main();
-let loadingScene = new Loading(()=> {
+let mainScene = new MainScene();
+let loadingScene = new LoadingScene(()=> {
 	console.log('assets is ready');
-	// load main scene
-	world.push(mainScene);
+	setTimeout(()=>{
+		// load main scene
+		world.push(mainScene);
+	},5*1000);
+
 });
 world.push(loadingScene);
 
