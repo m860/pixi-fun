@@ -124,6 +124,7 @@ module.exports = {
 		presets: ["es2015", 'stage-0']
 		, plugins: [
 			"transform-runtime"
+			,"transform-flow-strip-types"
 		]
 	}
 	, postcss: function () {

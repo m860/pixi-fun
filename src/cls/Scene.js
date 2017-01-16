@@ -1,0 +1,50 @@
+/**
+ * Created by xxx on 2017/1/15.
+ */
+export default class Scene{
+    constructor(conf:{
+        onInit:Function
+        ,onUpdate:Function
+    }={
+        onInit:()=>{}
+        ,onUpdate:()=>{}
+    }){
+        this.world=null;
+        conf.onInit(this);
+        conf.onUpdate(this);
+        this.bodies={};
+        this.sprites={};
+    }
+    addBody(name:String,bodyDef:Box2D.Dynamics.b2BodyDef,fixtureDefs:Box2D.Dynamics.b2FixtureDef[]){
+        if(!this.bodies[name]){
+            this.bodies[name]={
+                bodyDef,
+                fixtureDefs
+            };
+        }
+        else{
+            throw new Error(`the body name is ${name} is exists`);
+        }
+    }
+    addSprite(name:String,sprite:Object,bindBody:String){
+        if(!this.sprites[name]){
+            this.sprites[name]={
+                sprite,
+                bindBody
+            };
+        }
+        else{
+            throw new Error(`the sprite name is ${name} is exists`);
+        }
+    }
+    start(){
+        this.world.step();
+        this.world.render();
+        this.update();
+    }
+    update(){
+        requestAnimationFrame(this.update.bind(this));
+    }
+    stop(){
+    }
+}
