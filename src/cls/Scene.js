@@ -49,5 +49,10 @@ export default class Scene{
         }
     }
     stop(){
+        this.pause=true;
+    }
+    start(){
+        this.pause=false;
+        this.update();
     }
 }

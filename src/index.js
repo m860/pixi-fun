@@ -1,3 +1,4 @@
+require('./index.sass')
 import World from './cls/World'
 import Scene from './cls/Scene'
 import Loading from './cls/scenes/Loading'

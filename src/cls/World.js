@@ -17,7 +17,7 @@ export default class World {
         gravity: new Box2D.Common.Math.b2Vec2(0, 10)
         , allowSleeping: true
         , scale: 30.0
-        , debug: true
+        , debug: false
         , width: 400
         , height: 300
         , target: document.body
@@ -101,7 +101,7 @@ export default class World {
         }
         this._scenes.push(scene);
         if(autoStart) {
-            scene.update();
+            scene.start();
         }
     }
 
