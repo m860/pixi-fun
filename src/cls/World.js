@@ -84,23 +84,26 @@ export default class World {
 		onAfterRender();
 	}
 
-	removeAllBodies(){
-		let body=this.physics.GetBodyList();
-		while (body){
+	removeAllBodies() {
+		let body = this.physics.GetBodyList();
+		while (body) {
 			this.physics.DestroyBody(body);
-			body=body.GetNext();
+			body = body.GetNext();
 		}
 	}
 
-	removeAllSprite(){
+	removeAllSprite() {
 		this.stage.removeChildren();
 	}
 
 	push(scene: Object, autoStart: Boolean = true) {
-		let next=()=>{
+		let next = ()=> {
 			console.log(`start ${scene.constructor.name}`)
 			//load new scene
 			scene.world = this;
+			if (scene.conf.onBeforePush) {
+				scene.conf.onBeforePush(scene);
+			}
 			//create body
 			for (let name in scene.bodies) {
 				let obj = scene.bodies[name];
@@ -113,9 +116,18 @@ export default class World {
 			//add sprite
 			for (let name in scene.sprites) {
 				let obj = scene.sprites[name];
+				if (obj.bindBody) {
+					scene.sync.push({
+						sprite: obj.sprite,
+						body: scene.bodies[obj.bindBody].body
+					});
+				}
 				this.stage.addChild(obj.sprite);
 			}
 			this._scenes.push(scene);
+			if (scene.conf.onAfterPush) {
+				scene.conf.onAfterPush(scene);
+			}
 			if (autoStart) {
 				scene.start();
 			}
@@ -128,7 +140,7 @@ export default class World {
 				next();
 			});
 		}
-		else{
+		else {
 			next();
 		}
 	}

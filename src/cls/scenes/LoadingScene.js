@@ -48,8 +48,10 @@ export default class LoadingScene extends Scene {
 				this.sprites['progressValue'].sprite.text = event.progress;
 			})
 			.load((loader, resources)=> {
-				this.sprites['progressValue'].sprite.text = 'done';
-				this.onLoaded();
+				this.sprites['progressValue'].sprite.text = 100;
+				setTimeout(()=>{
+					this.onLoaded(loader, resources);
+				},1000);
 			});
 	}
 }
