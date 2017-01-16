@@ -17,43 +17,39 @@ export const ASSETS = {
 export default class Loading extends Scene {
 	constructor(onLoaded: Function, conf) {
 		super(conf);
-		// this.progress = 0;
 		this.onLoaded = onLoaded;
-		let textStyle= {
-			fontFamily : 'Arial',
-			fontSize : '36px',
-			fontStyle : 'italic',
-			fontWeight : 'bold',
-			fill : '#F7EDCA',
-			stroke : '#4a1850',
-			strokeThickness : 5,
-			dropShadow : true,
-			dropShadowColor : '#000000',
-			dropShadowAngle : Math.PI / 6,
-			dropShadowDistance : 6,
-			wordWrap : true,
-			wordWrapWidth : 440
+		let textStyle = {
+			fontFamily: 'Arial',
+			fontSize: '36px',
+			fontStyle: 'italic',
+			fontWeight: 'bold',
+			fill: '#F7EDCA',
+			stroke: '#4a1850',
+			strokeThickness: 5,
+			dropShadow: true,
+			dropShadowColor: '#000000',
+			dropShadowAngle: Math.PI / 6,
+			dropShadowDistance: 6,
+			wordWrap: true,
+			wordWrapWidth: 440
 		};
-		let textSprite=new PIXI.Text('00',textStyle);
-		this.addSprite('progressValue',textSprite);
+		let textSprite = new PIXI.Text('00', textStyle);
+		this.addSprite('progressValue', textSprite);
 	}
 
-	load() {
+	start() {
+		super.start();
+		console.log('begin loading ...')
 		PIXI.loader
 			.add(getValues(ASSETS))
 			.on('progress', event=> {
 				//update sprite
-				console.log(event.progress)
-				// this.sprites['progressValue'].sprite.text=event.progress;
-				this.sprites['progressValue'].sprite.setText(event.progress);
+				// this.sprites['progressValue'].sprite.setText(event.progress);
+				this.sprites['progressValue'].sprite.text = event.progress;
 			})
 			.load((loader, resources)=> {
-				this.sprites['progressValue'].sprite.setText('done');
-				setTimeout(()=>{
-					this.pause = true;
-					this.onLoaded();
-				},100);
+				this.sprites['progressValue'].sprite.text = 'done';
+				this.onLoaded();
 			});
-		this.update();
 	}
 }

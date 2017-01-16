@@ -1,7 +1,12 @@
 /**
  * Created by xxx on 2017/1/15.
  */
+
 export default class Scene{
+    static STATUS_INIT=0;
+    static STATUS_RUNNING=10;
+    static STATUS_PAUSE=20;
+    static STATUS_CLEAR=30;
     constructor(conf:{
         onBeforeStep:Function
         ,onAfterStep:Function
@@ -17,7 +22,8 @@ export default class Scene{
         this.world=null;
         this.bodies={};
         this.sprites={};
-        this.pause=false;
+        this.status=Scene.STATUS_INIT;
+        this.onClear=null;
     }
     addBody(name:String,bodyDef:Box2D.Dynamics.b2BodyDef,fixtureDefs:Box2D.Dynamics.b2FixtureDef[]){
         if(!this.bodies[name]){
@@ -42,17 +48,33 @@ export default class Scene{
         }
     }
     update(){
-        if(!this.pause) {
+        if(this.status===Scene.STATUS_RUNNING) {
             this.world.step(this.conf.onBeforeStep, this.conf.onAfterStep);
             this.world.render(this.conf.onBeforeRender, this.conf.onAfterRender);
             requestAnimationFrame(this.update.bind(this));
         }
+        if(this.status===Scene.STATUS_CLEAR){
+            debugger
+            // remove all bodies
+            this.world.removeAllBodies();
+            // remove all sprite
+            this.world.removeAllSprite();
+            this.world.step(this.conf.onBeforeStep, this.conf.onAfterStep);
+            this.world.render(this.conf.onBeforeRender, this.conf.onAfterRender);
+            // invoke onClear
+            this.onClear();
+        }
     }
-    stop(){
-        this.pause=true;
+    pause(){
+        this.status=Scene.STATUS_PAUSE;
     }
     start(){
-        this.pause=false;
+        this.status=Scene.STATUS_RUNNING;
         this.update();
+    }
+    clear(callback:Function=()=>{}){
+
+        this.status=Scene.STATUS_CLEAR;
+        this.onClear=callback;
     }
 }
