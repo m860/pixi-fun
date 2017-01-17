@@ -6,17 +6,17 @@ const defaultConf = {
 	, allowSleeping: true
 	, scale: 30.0
 	, debug: false
-	, width: 400
-	, height: 300
+	, width: 800
+	, height: 600
 	, target: document.body
 	, fps: 60
 	, velocityIterations: 10
 	, positionIterations: 8
 	, design: {
-		width: 400,
-		height: 300
+		width: 800,
+		height: 600
 	}
-	, scaleSpriteModel: 'uniform-width'
+	, scaleSpriteModel: 'none'
 }
 export default class World {
 	constructor(conf: {
