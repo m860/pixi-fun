@@ -3,6 +3,7 @@
  */
 import Scene from '../Scene.js'
 import {ASSETS} from '../scenes/LoadingScene'
+import Keyboard from '../Keyboard';
 
 const Sprite = PIXI.Sprite,
 	b2BodyDef = Box2D.Dynamics.b2BodyDef,
@@ -12,6 +13,16 @@ const Sprite = PIXI.Sprite,
 	b2PolygonShape=Box2D.Collision.Shapes.b2PolygonShape;
 
 export default class Main extends Scene {
+	constructor(conf){
+		super(conf);
+		this.keyboardListener=new Keyboard();
+	}
+	clear(callback){
+		super.clear(()=>{
+			this.keyboardListener.clear();
+			callback();
+		});
+	}
 	initScene(resources) {
 		let planeTexture=resources[ASSETS.plane].texture;
 

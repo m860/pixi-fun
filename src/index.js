@@ -4,6 +4,8 @@ import Scene from './cls/Scene'
 import LoadingScene, {ASSETS} from './cls/scenes/LoadingScene.js'
 import MainScene from './cls/scenes/MainScene.js'
 
+// const scale = window.innerHeight/931;
+
 let world = new World({
 	width: window.innerWidth
 	, height: window.innerHeight
@@ -12,7 +14,7 @@ let world = new World({
 		width: 1440,
 		height: 931
 	}
-	,scaleSpriteModel:'uniform-height'
+	, scaleSpriteModel: 'uniform-height'
 });
 
 let loadingScene = new LoadingScene((loader, resources)=> {

@@ -52,6 +52,19 @@ export default class World {
 		else {
 			this.renderer = PIXI.autoDetectRenderer(conf.width, conf.height);
 		}
+		// resize render
+		switch (conf.scaleSpriteModel) {
+			case 'auto':
+				break;
+				this.renderer.resize(conf.design.width * this._spriteScale.x, conf.design.height * this._spriteScale.y);
+			case 'uniform-width':
+				this.renderer.resize(conf.design.width * this._spriteScale.x, conf.design.height * this._spriteScale.x);
+				break;
+			case 'uniform-height':
+				this.renderer.resize(conf.design.width * this._spriteScale.y, conf.design.height * this._spriteScale.y);
+				break;
+			default:
+		}
 		conf.target.appendChild(this.renderer.view);
 		if (conf.debug) {
 			let debugDraw = new Box2D.Dynamics.b2DebugDraw();
@@ -66,11 +79,11 @@ export default class World {
 	}
 
 	get width() {
-		return this.conf.width
+		return this.renderer.width;
 	}
 
 	get height() {
-		return this.conf.height;
+		return this.renderer.height;
 	}
 
 	get currenScene() {
@@ -140,18 +153,18 @@ export default class World {
 						body: scene.bodies[obj.bindBody].body
 					});
 				}
-				switch (this.conf.scaleSpriteModel){
+				switch (this.conf.scaleSpriteModel) {
 					case 'uniform-width':
-						obj.sprite.scale.x=this._spriteScale.x;
-						obj.sprite.scale.y=this._spriteScale.x;
+						obj.sprite.scale.x = this._spriteScale.x;
+						obj.sprite.scale.y = this._spriteScale.x;
 						break;
 					case 'uniform-height':
-						obj.sprite.scale.x=this._spriteScale.y;
-						obj.sprite.scale.y=this._spriteScale.y;
+						obj.sprite.scale.x = this._spriteScale.y;
+						obj.sprite.scale.y = this._spriteScale.y;
 						break;
 					case 'auto':
-						obj.sprite.scale.x=this._spriteScale.x;
-						obj.sprite.scale.y=this._spriteScale.y;
+						obj.sprite.scale.x = this._spriteScale.x;
+						obj.sprite.scale.y = this._spriteScale.y;
 						break;
 					default:
 				}
