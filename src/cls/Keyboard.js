@@ -15,15 +15,14 @@ export default class Keyboard {
     constructor() {
         this.status = new Array(255);
         this.reset();
+        this[keydownHandler]=()=>{
+            this.status[event.keyCode] = true;
+        };
+        this[keyupHandler]=()=>{
+            this.status[event.keyCode] = false;
+        };
         document.addEventListener('keydown', this[keydownHandler], false);
         document.addEventListener('keyup', this[keyupHandler], false);
-    }
-
-    [keydownHandler](event){
-        this.status[event.keyCode] = true;
-    }
-    [keyupHandler](event){
-        this.status[event.keyCode] = false;
     }
 
     keydown(code) {

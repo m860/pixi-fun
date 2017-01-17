@@ -9,12 +9,13 @@ import MainScene from './cls/scenes/MainScene.js'
 let world = new World({
 	width: window.innerWidth
 	, height: window.innerHeight
-	, debug: false
+	, debug: true
 	, design: {
 		width: 1440,
 		height: 931
 	}
 	, scaleSpriteModel: 'uniform-height'
+	, gravity: new Box2D.Common.Math.b2Vec2(0, 0)
 });
 
 let loadingScene = new LoadingScene((loader, resources)=> {

@@ -16,12 +16,43 @@ export default class Main extends Scene {
 	constructor(conf){
 		super(conf);
 		this.keyboardListener=new Keyboard();
+		this.planeSpeed=0.3;
 	}
 	clear(callback){
 		super.clear(()=>{
 			this.keyboardListener.clear();
 			callback();
 		});
+	}
+	update(lastUpdateTime){
+		let deltaTime=Date.now()-lastUpdateTime;
+		this.movePlane(deltaTime);
+		super.update();
+	}
+	movePlane(deltaTime){
+		let body=this.bodies['plane'].body;
+		let pos=body.GetPosition().Copy();
+		if(this.keyboardListener.keydown(Keyboard.W)){
+			let up=new b2Vec2(0,-1);
+			up.Multiply(deltaTime*this.planeSpeed/this.world.conf.scale);
+			pos.Add(up);
+		}
+		if(this.keyboardListener.keydown(Keyboard.S)){
+			let down=new b2Vec2(0,1);
+			down.Multiply(deltaTime*this.planeSpeed/this.world.conf.scale);
+			pos.Add(down);
+		}
+		if(this.keyboardListener.keydown(Keyboard.A)){
+			let left=new b2Vec2(-1,0);
+			left.Multiply(deltaTime*this.planeSpeed/this.world.conf.scale);
+			pos.Add(left);
+		}
+		if(this.keyboardListener.keydown(Keyboard.D)){
+			let right=new b2Vec2(1,0);
+			right.Multiply(deltaTime*this.planeSpeed/this.world.conf.scale);
+			pos.Add(right);
+		}
+		body.SetPosition(pos);
 	}
 	initScene(resources) {
 		let planeTexture=resources[ASSETS.plane].texture;
@@ -43,7 +74,8 @@ export default class Main extends Scene {
 		// create plane body
 		let planeBodyDef = new b2BodyDef();
 		planeBodyDef.type=b2Body.b2_dynamicBody;
-		planeBodyDef.position.Set(0,0);
+		planeBodyDef.position.Set(this.world.getWorldValue(50),this.world.getWorldValue(50));
+		planeBodyDef.allowSleep=false;
 		// planeBodyDef.position.Set(new b2Vec2(this.world.getWorldValue(this.world.width/2),this.world.getWorldValue(this.world.height/2)));
 		let planeFixtureDef=new b2FixtureDef();
 		planeFixtureDef.shape=new b2PolygonShape();

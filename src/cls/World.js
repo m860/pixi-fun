@@ -55,8 +55,8 @@ export default class World {
 		// resize render
 		switch (conf.scaleSpriteModel) {
 			case 'auto':
-				break;
 				this.renderer.resize(conf.design.width * this._spriteScale.x, conf.design.height * this._spriteScale.y);
+				break;
 			case 'uniform-width':
 				this.renderer.resize(conf.design.width * this._spriteScale.x, conf.design.height * this._spriteScale.x);
 				break;

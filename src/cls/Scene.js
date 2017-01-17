@@ -64,7 +64,8 @@ export default class Scene {
 		}
 	}
 
-	update() {
+	update(lastUpdateTime=Date.now()) {
+		lastUpdateTime=Date.now();
 		if (this.status === Scene.STATUS_RUNNING) {
 			this.world.step(this.conf.onBeforeStep, this.conf.onAfterStep);
 			this.sync.map(item=>{
@@ -76,7 +77,7 @@ export default class Scene {
 				item.sprite.angle=bodyAngle;
 			});
 			this.world.render(this.conf.onBeforeRender, this.conf.onAfterRender);
-			requestAnimationFrame(this.update.bind(this));
+			requestAnimationFrame(this.update.bind(this,lastUpdateTime));
 		}
 		if (this.status === Scene.STATUS_CLEAR) {
 			console.log(`${this.constructor.name} is clear`);
