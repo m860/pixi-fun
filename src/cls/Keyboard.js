@@ -1,6 +1,8 @@
 /**
  * Created by xxx on 2017/1/15.
  */
+const keydownHandler=Symbol();
+const keyupHandler=Symbol();
 export default class Keyboard {
     static W = 87;
     static S = 83;
@@ -13,12 +15,15 @@ export default class Keyboard {
     constructor() {
         this.status = new Array(255);
         this.reset();
-        document.addEventListener('keydown', event=> {
-            this.status[event.keyCode] = true;
-        }, false);
-        document.addEventListener('keyup', event=> {
-            this.status[event.keyCode] = false;
-        }, false);
+        document.addEventListener('keydown', this[keydownHandler], false);
+        document.addEventListener('keyup', this[keyupHandler], false);
+    }
+
+    [keydownHandler](event){
+        this.status[event.keyCode] = true;
+    }
+    [keyupHandler](event){
+        this.status[event.keyCode] = false;
     }
 
     keydown(code) {
@@ -29,5 +34,10 @@ export default class Keyboard {
         for (let i = 0; i < this.status.length; i++) {
             this.status[i] = false;
         }
+    }
+
+    clear(){
+        document.removeEventListener('keydown',this[keydownHandler],false);
+        document.removeEventListener('keyup',this[keyupHandler],false);
     }
 }

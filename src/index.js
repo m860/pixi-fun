@@ -4,11 +4,20 @@ import Scene from './cls/Scene'
 import LoadingScene, {ASSETS} from './cls/scenes/LoadingScene.js'
 import MainScene from './cls/scenes/MainScene.js'
 
-let world = new World();
+let world = new World({
+	width: window.innerWidth
+	, height: window.innerHeight
+	, debug: false
+	, design: {
+		width: 1440,
+		height: 931
+	}
+	,scaleSpriteModel:'uniform-height'
+});
 
 let loadingScene = new LoadingScene((loader, resources)=> {
 	let mainScene = new MainScene({
-		onBeforePush:(self)=>{
+		onBeforePush: (self)=> {
 			self.initScene(resources);
 		}
 	});

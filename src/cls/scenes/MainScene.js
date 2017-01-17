@@ -15,15 +15,15 @@ export default class Main extends Scene {
 	initScene(resources) {
 		let planeTexture=resources[ASSETS.plane].texture;
 
-		//test
-		let progressBodyDef = new b2BodyDef();
-		progressBodyDef.type = b2Body.b2_staticBody;
-		progressBodyDef.position.Set(this.world.getWorldValue(this.world.width / 2), this.world.getWorldValue(this.world.height / 2));
-		// progressBodyDef.position.Set(0,0);
-		let progressFixtureDef = new b2FixtureDef();
-		progressFixtureDef.shape = new b2PolygonShape();
-		progressFixtureDef.shape.SetAsBox(this.world.getWorldValue(200), this.world.getWorldValue(30));
-		this.addBody('progress', progressBodyDef, [progressFixtureDef]);
+		// //test
+		// let progressBodyDef = new b2BodyDef();
+		// progressBodyDef.type = b2Body.b2_staticBody;
+		// progressBodyDef.position.Set(this.world.getWorldValue(this.world.width / 2), this.world.getWorldValue(this.world.height / 2));
+		// // progressBodyDef.position.Set(0,0);
+		// let progressFixtureDef = new b2FixtureDef();
+		// progressFixtureDef.shape = new b2PolygonShape();
+		// progressFixtureDef.shape.SetAsBox(this.world.getWorldValue(200), this.world.getWorldValue(30));
+		// this.addBody('progress', progressBodyDef, [progressFixtureDef]);
 
 		// create background
 		let backgroundSprite = new Sprite(resources[ASSETS.background].texture);

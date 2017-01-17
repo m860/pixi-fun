@@ -1,6 +1,23 @@
 /**
  * Created by xxx on 2017/1/15.
  */
+const defaultConf = {
+	gravity: new Box2D.Common.Math.b2Vec2(0, 10)
+	, allowSleeping: true
+	, scale: 30.0
+	, debug: false
+	, width: 400
+	, height: 300
+	, target: document.body
+	, fps: 60
+	, velocityIterations: 10
+	, positionIterations: 8
+	, design: {
+		width: 400,
+		height: 300
+	}
+	, scaleSpriteModel: 'uniform-width'
+}
 export default class World {
 	constructor(conf: {
 		gravity:Box2D.Common.Math.b2Vec2
@@ -13,18 +30,19 @@ export default class World {
 		,fps:Number
 		, velocityIterations:Number
 		, positionIterations:Number
-	} = {
-		gravity: new Box2D.Common.Math.b2Vec2(0, 10)
-		, allowSleeping: true
-		, scale: 30.0
-		, debug: false
-		, width: 400
-		, height: 300
-		, target: document.body
-		, fps: 60
-		, velocityIterations: 10
-		, positionIterations: 8
-	}) {
+		, design: {
+			width: Number,
+			height: Number
+		}
+		,scaleSpriteModel:'auto'|'uniform-width'|'uniform-height'|'none'
+	} = defaultConf) {
+		conf = Object.assign({
+			...defaultConf
+		}, conf);
+		this._spriteScale = {
+			x: conf.width / conf.design.width,
+			y: conf.height / conf.design.height
+		};
 		this.conf = conf;
 		this.physics = new Box2D.Dynamics.b2World(conf.gravity, conf.allowSleeping);
 		this.renderer = null;
@@ -122,6 +140,22 @@ export default class World {
 						body: scene.bodies[obj.bindBody].body
 					});
 				}
+				switch (this.conf.scaleSpriteModel){
+					case 'uniform-width':
+						obj.sprite.scale.x=this._spriteScale.x;
+						obj.sprite.scale.y=this._spriteScale.x;
+						break;
+					case 'uniform-height':
+						obj.sprite.scale.x=this._spriteScale.y;
+						obj.sprite.scale.y=this._spriteScale.y;
+						break;
+					case 'auto':
+						obj.sprite.scale.x=this._spriteScale.x;
+						obj.sprite.scale.y=this._spriteScale.y;
+						break;
+					default:
+				}
+
 				this.stage.addChild(obj.sprite);
 			}
 			this._scenes.push(scene);
